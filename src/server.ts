@@ -1,22 +1,29 @@
+import morgan from 'morgan';
 import { config } from 'dotenv';
-import connectDB from './config/db';
 import express, { json } from 'express';
-import userRouter from './routes/userRoutes';
-import costRouter from './routes/costRoutes';
-
+import userRouter from './routes/user.router';
+import costRouter from './routes/cost.router';
+import connectDB from './config/database.config';
+import { errorHandler } from './middleware/error.middleware';
 
 config();
 
 const main = async () => {
-    connectDB();
-    const app = express();
-    app.use(json());
+  connectDB();
+  const app = express();
 
-    app.use('/api/users', userRouter);
-    app.use('/api/costs', costRouter);
+  app.use(json());
+  app.use(errorHandler);
+  app.use(morgan('dev'));
 
-    const PORT = process.env.PORT || 5000;
-    return app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-}
+  app.use('/api/users', userRouter);
+  app.use('/api/costs', costRouter);
 
-main()
+  const PORT = process.env.PORT || 5000;
+
+  return app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+};
+
+main();

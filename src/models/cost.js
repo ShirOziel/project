@@ -1,10 +1,13 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose';
 
-const costSchema = new Schema({
+const costSchema = new Schema(
+  {
     description: { type: String, required: true },
     category: { type: String, required: true },
-    userid: { type: String, required: true }, // Matches the `id` field in User
-    sum: { type: Number, required: true, min: 0 }
-}, { timestamps: true }); // Adds createdAt & updatedAt fields
+    userid: { type: String, required: true },
+    sum: { type: Number, required: true, min: 0 },
+  },
+  { timestamps: true },
+);
 
-export const Cost = model("Cost", costSchema);
+export const Cost = model('Cost', costSchema);
