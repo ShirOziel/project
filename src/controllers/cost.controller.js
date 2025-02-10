@@ -11,29 +11,61 @@ const getCosts = async (req, res) => {
 
 const addCost = async (req, res) => {
   try {
-    const { description, category, userid, sum } = req.body;
+    let { description, category, userid, sum } = req.body;
+    category = category.toLowerCase();
 
-    // בדיקה אם כל השדות חובה קיימים
     if (!description || !category || !userid || sum === undefined) {
-      return res.status(400).json({
-        message:
-          'All fields are required: description, category, userid, and sum.',
-      });
+      return res.status(400).json({ message: 'All fields are required.' });
     }
 
-    // יצירת מסמך חדש
-    const newCost = Cost.create({
-      sum,
-      userid,
-      category,
-      description,
-    });
+    const newCost = new Cost({ description, category, userid, sum, created_at: new Date() });
 
     await newCost.save();
     res.status(201).json(newCost);
   } catch (error) {
-    res.status(400).json({ message: 'Failed to add cost: ' + error.message });
+    res.status(500).json({ message: 'Error adding cost item: ' + error.message });
   }
 };
 
-export default { getCosts, addCost };
+const getMonthlyReport = async (req, res) => {
+  const { id, year, month } = req.query;
+  if (!id || !year || !month) {
+    return res.status(400).json({ error: 'Please provide id, year, and month.' });
+  }
+
+  try {
+    const costs = await Cost.aggregate([
+      {
+        $match: {
+          userid: id,
+          createdAt: {
+            $gte: new Date(`${year}-${month}-01`),
+            $lt: new Date(`${parseInt(year) + 1}-${month}-01`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { category: '$category' },
+          costs: {
+            $push: { sum: '$sum', description: '$description', day: { $dayOfMonth: '$createdAt' } },
+          },
+        },
+      },
+      {
+        $project: { category: '$_id.category', costs: 1, _id: 0 },
+      },
+    ]);
+
+    if (costs.length === 0) {
+      return res.status(404).json({ error: 'No costs found for this user in this month.' });
+    }
+
+    const report = { userid: id, year, month, costs };
+    return res.json(report);
+  } catch (error) {
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+
+export default { getCosts, addCost, getMonthlyReport };

@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title Monthly Report
+  body
+    h1 Monthly Report
+    form(action="/api/costs/report", method="GET")
+      label(for="userid") User ID:
+      input(type="text" name="userid" required)
+      br
+      label(for="year") Year:
+      input(type="number" name="year" required)
+      br
+      label(for="month") Month:
+      input(type="number" name="month" required)
+      br
+      button(type="submit") Get Report

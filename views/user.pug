@@ -1,0 +1,11 @@
+doctype html
+html
+  head
+    title User Details
+  body
+    h1 User Details
+    form(action="/api/users", method="GET")
+      label(for="userid") User ID:
+      input(type="text" name="userid" required)
+      br
+      button(type="submit") Get Details
