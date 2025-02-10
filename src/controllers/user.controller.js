@@ -54,5 +54,5 @@ export const getUserDetails = async (req, res) => {
   }
 };
 
-// ייצוא כל הפונקציות כולל getUserDetails
+// ייצוא כל הפונקציות
 export { getUsers, createUser, getUserDetails };
