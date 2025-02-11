@@ -17,9 +17,11 @@ const main = async () => {
   connectDB();
   const app = express();
 
-  // Set PUG as the template engine
-  app.set('view engine', 'pug');
-  app.set('views', './views');
+  
+ //Root route for the API
+  app.get("/", (req, res) => {
+  res.send("Welcome to Yarden and Shir Project!");
+  });
 
   // Middleware
   app.use(json());
@@ -45,6 +47,8 @@ const main = async () => {
   return app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+
+  
 };
 
 main();
