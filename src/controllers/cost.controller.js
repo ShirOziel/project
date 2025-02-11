@@ -44,7 +44,7 @@ const addCost = async (req, res) => {
 const getMonthlyReport = async (req, res) => {
   const { id, year, month } = req.query;
   if (!id || !year || !month) {
-    return res.status(400).json({ error: 'Please provide id, year, and month.' });
+    return res.status(400).json({ error: "Please provide id, year, and month." });
   }
 
   try {
@@ -53,32 +53,47 @@ const getMonthlyReport = async (req, res) => {
         $match: {
           userid: id,
           createdAt: {
-            $gte: new Date(`${year}-${month}-01`),
-            $lt: new Date(`${parseInt(year) + 1}-${month}-01`),
+            $gte: new Date(`${year}-${month}-01T00:00:00.000Z`),
+            $lt: new Date(`${year}-${month}-31T23:59:59.999Z`),
           },
         },
       },
       {
         $group: {
-          _id: { category: '$category' },
+          _id: "$category",
           costs: {
-            $push: { sum: '$sum', description: '$description', day: { $dayOfMonth: '$createdAt' } },
+            $push: {
+              sum: "$sum",
+              description: "$description",
+              day: { $dayOfMonth: "$createdAt" },
+            },
           },
         },
       },
-      {
-        $project: { category: '$_id.category', costs: 1, _id: 0 },
-      },
     ]);
 
-    if (costs.length === 0) {
-      return res.status(404).json({ error: 'No costs found for this user in this month.' });
-    }
+    const categories = ["food", "education", "health", "housing"];
+    const report = {};
 
-    const report = { userid: id, year, month, costs };
-    return res.json(report);
+    categories.forEach(category => {
+      report[category] = [];
+    });
+
+    costs.forEach(cost => {
+      report[cost._id] = cost.costs;
+    });
+
+    return res.json({
+      userid: id,
+      year,
+      month,
+      costs: Object.entries(report).map(([category, items]) => ({
+        [category]: items,
+      })),
+    });
+
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: "Server error" });
   }
 };
 
