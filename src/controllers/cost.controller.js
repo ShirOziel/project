@@ -11,14 +11,20 @@ const getCosts = async (req, res) => {
 
 const addCost = async (req, res) => {
   try {
-    let { description, category, userid, sum } = req.body;
-    category = category.toLowerCase();
+    let { description, category, userid, sum, createdAt } = req.body;
+    /*category = category.toLowerCase();*/
 
     if (!description || !category || !userid || sum === undefined) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
 
-    const newCost = new Cost({ description, category, userid, sum, created_at: new Date() });
+    const newCost = new Cost({ 
+      description, 
+      category, 
+      userid, 
+      sum, 
+      createdAt: createdAt ? new Date(createdAt) : undefined // ✅ אם נשלח תאריך, השתמש בו; אחרת השתמש בברירת המחדל של הסכימה
+    });
 
     await newCost.save();
     res.status(201).json(newCost);
@@ -26,6 +32,7 @@ const addCost = async (req, res) => {
     res.status(500).json({ message: 'Error adding cost item: ' + error.message });
   }
 };
+
 
 const getMonthlyReport = async (req, res) => {
   const { id, year, month } = req.query;
