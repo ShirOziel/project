@@ -1,6 +1,9 @@
 import { Cost } from '../models/cost.js';
 import { User } from '../models/user.js';
 
+/**
+ * Retrieves all users
+ */
 const getUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -10,6 +13,9 @@ const getUsers = async (req, res) => {
   }
 };
 
+/**
+ * Creates a new user
+ */
 const createUser = async (req, res) => {
   try {
     const { first_name, last_name, birthday, marital_status } = req.body;
@@ -30,6 +36,9 @@ const createUser = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves details of a specific user, including total cost
+ */
 export const getUserDetails = async (req, res) => {
   try {
     const user = await User.findOne({ id: req.params.id });
@@ -38,6 +47,7 @@ export const getUserDetails = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Calculate total cost for the user
     const totalCost = await Cost.aggregate([
       { $match: { userid: req.params.id } },
       { $group: { _id: null, total: { $sum: "$sum" } } }
@@ -54,5 +64,4 @@ export const getUserDetails = async (req, res) => {
   }
 };
 
-// ייצוא כל הפונקציות
 export { getUsers, createUser, getUserDetails };

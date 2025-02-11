@@ -1,5 +1,8 @@
 import { connect } from 'mongoose';
 
+/**
+ * Establishes a connection to the MongoDB database
+ */
 const connectDB = async () => {
   try {
     const conn = await connect(process.env.MONGO_URI, {
@@ -7,9 +10,9 @@ const connectDB = async () => {
       useUnifiedTopology: true,
     });
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected: ${conn.connection.host}`); // Log successful connection
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    console.error(`Error: ${error.message}`); // Log connection error
   }
 };
 

@@ -1,5 +1,8 @@
 import { Cost } from '../models/cost.js';
 
+/**
+ * Retrieves all cost entries
+ */
 const getCosts = async (req, res) => {
   try {
     const costs = await Cost.find();
@@ -9,10 +12,12 @@ const getCosts = async (req, res) => {
   }
 };
 
+/**
+ * Adds a new cost entry
+ */
 const addCost = async (req, res) => {
   try {
     let { description, category, userid, sum, createdAt } = req.body;
-    /*category = category.toLowerCase();*/
 
     if (!description || !category || !userid || sum === undefined) {
       return res.status(400).json({ message: 'All fields are required.' });
@@ -23,7 +28,7 @@ const addCost = async (req, res) => {
       category, 
       userid, 
       sum, 
-      createdAt: createdAt ? new Date(createdAt) : undefined // ✅ אם נשלח תאריך, השתמש בו; אחרת השתמש בברירת המחדל של הסכימה
+      createdAt: createdAt ? new Date(createdAt) : new Date() // Default to current date if not provided
     });
 
     await newCost.save();
@@ -33,7 +38,9 @@ const addCost = async (req, res) => {
   }
 };
 
-
+/**
+ * Generates a monthly cost report for a given user
+ */
 const getMonthlyReport = async (req, res) => {
   const { id, year, month } = req.query;
   if (!id || !year || !month) {

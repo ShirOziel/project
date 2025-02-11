@@ -10,14 +10,14 @@ import { getAbout } from './controllers/about.controller';
 import costController from './controllers/cost.controller';
 const { getMonthlyReport, addCost } = costController;
 
-// טעינת משתני הסביבה
+// Load environment variables
 config();
 
 const main = async () => {
   connectDB();
   const app = express();
 
-  // הגדרת PUG כמנוע תבניות
+  // Set PUG as the template engine
   app.set('view engine', 'pug');
   app.set('views', './views');
 
@@ -26,21 +26,21 @@ const main = async () => {
   app.use(morgan('dev'));
   app.use(errorHandler);
 
-  // הגדרת ה-Routes
+  // Define routes
   app.use('/api/users', userRouter);
   app.use('/api/costs', costRouter);
   app.use('/api/about', aboutRouter);
 
-  // הוספת נתיב API ל-ABOUT (כפי שהמרצה דורש)
+  // Add API route for ABOUT (as required by the instructor)
   app.get('/api/about/', getAbout);
 
-  // הוספת נתיב API לדוח חודשי (report)
+  // Add API route for monthly report (report)
   app.get('/api/report/', getMonthlyReport);
 
-  // הוספת נתיב API להוספת פריט עלות (add)
+  // Add API route for adding a cost item (add)
   app.post('/api/add/', addCost);
 
-  // הפעלת השרת
+  // Start the server
   const PORT = process.env.PORT || 5000;
   return app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
